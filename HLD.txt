@@ -1,22 +1,36 @@
-User Upload (CSV/Excel/JSON)
-        ↓
-API / UI (FastAPI or Streamlit)
-        ↓
-Profiler Agent (local code)
-  - collects samples & stats
-        ↓
-LLM Schema Identifier Agent (LangChain/OpenAI)
-  - receives samples+stats, returns semantic type predictions
-        ↓
-Conversion Planner Agent (LLM + rules)
-  - produces safe transformation plan (code or recipe)
-        ↓
-Executor Agent (Python Worker)
-  - executes Pandas transforms (in sandboxed environment)
-        ↓
-Validator Agent (local code + LLM check)
-  - checks conversion accuracy / data loss
-        ↓
-Output: cleaned file + JSON report + logs
-        ↓
-Optional: Feedback loop to update RAG store (examples)
+           ┌───────────────────────────┐
+           │          User              │
+           │   Uploads CSV/Excel file   │
+           └───────────────┬───────────┘
+                           │
+                           ▼
+             ┌────────────────────────┐
+             │     Data Profiler      │
+             │ (Pandas-based stats)   │
+             └─────────────┬──────────┘
+                           │ Profiling report
+                           ▼
+            ┌──────────────────────────┐
+            │ Data Type Classifier     │
+            │   (LLM Agent 1)          │
+            └─────────────┬────────────┘
+                          │ Column → Type
+                          ▼
+          ┌──────────────────────────────┐
+          │  Conversion Plan Generator   │
+          │         (LLM Agent 2)        │
+          └──────────────┬──────────────┘
+                          │ Cleaning steps
+                          ▼
+             ┌───────────────────────────┐
+             │  Executor + Validator     │
+             │   (Python)                │
+             └──────────────┬────────────┘
+                            │ Clean data + report
+                            ▼
+          ┌────────────────────────────────┐
+          │         Final Outputs          │
+          │ - cleaned CSV                  │
+          │ - JSON report of schema        │
+          │ - explanation for user         │
+          └────────────────────────────────┘

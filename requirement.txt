@@ -1,0 +1,13 @@
+fastapi
+uvicorn[standard]
+pandas>=1.5
+numpy
+langchain
+openai
+python-dotenv
+pydantic
+streamlit 
+pytest
+chardet
+python-multipart
+tqdm
