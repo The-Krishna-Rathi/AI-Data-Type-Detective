@@ -1,17 +1,27 @@
-import pandas as pd
 from profiler.profiler import Profiler
 from ai_inference.ai_engine import AIInferenceEngine
-import json
+from rules.rule_engine import RuleEngine
+from hybrid.hybrid_classifier import HybridClassifier
+
 from dotenv import load_dotenv
+import pandas as pd
+import json
+
 
 df = pd.read_csv("../data/sample.csv")
 
 load_dotenv()  # loads .env from current or parent dir
 
 profiler = Profiler()
-profiling_report = profiler.profile_dataframe(df)
+rule_engine = RuleEngine()
+ai = AIInferenceEngine()
 
-ai_engine = AIInferenceEngine(model='llama3.2')
-inference_report = ai_engine.infer_dataframe(profiling_report)
+hybrid = HybridClassifier(profiler, rule_engine, ai)
 
-print(json.dumps(inference_report, indent=4))
+results = {}
+
+for col in df.columns:
+    print(f"Classifying column: {col}")
+    results[col] = hybrid.classify_column(df[col], col)
+
+print(json.dumps(results, indent=4))
