@@ -2,26 +2,52 @@ from profiler.profiler import Profiler
 from ai_inference.ai_engine import AIInferenceEngine
 from rules.rule_engine import RuleEngine
 from hybrid.hybrid_classifier import HybridClassifier
+from processor.type_convertor import TypeConverter
 
 from dotenv import load_dotenv
 import pandas as pd
 import json
 
+def main():
+    load_dotenv()  # loads .env from current or parent dir
 
-df = pd.read_csv("../data/sample.csv")
+    # Step 1: Load CSV
+    df = pd.read_csv("../data/sample.csv")
 
-load_dotenv()  # loads .env from current or parent dir
+    # Step 2: Profiler
+    profiler = Profiler()
 
-profiler = Profiler()
-rule_engine = RuleEngine()
-ai = AIInferenceEngine()
+    # Step 3: AI inference
+    ai_engine = AIInferenceEngine()
 
-hybrid = HybridClassifier(profiler, rule_engine, ai)
+    # Step 4: Rule-based
+    rule_engine = RuleEngine()
 
-results = {}
+    # Step 5: Hybrid engine selects final datatype
+    print("Running Hybrid Classifier.....")
+    hybrid = HybridClassifier(profiler, rule_engine, ai_engine)
 
-for col in df.columns:
-    print(f"Classifying column: {col}")
-    results[col] = hybrid.classify_column(df[col], col)
+    final_schema = {}
+    for col in df.columns:
+        final_schema[col] = hybrid.classify_column(df[col], col)
 
-print(json.dumps(results, indent=4))
+    print("\n--- Final Schema ---")
+    print(json.dumps(final_schema, indent=4))
+
+    # Step 6: APPLY DATATYPE CONVERSIONS  (Milestone 5)
+    print("Running Final type conversion.....")
+    converter = TypeConverter()
+    cleaned_df, conversion_report = converter.apply_final_datatypes(df, final_schema)
+
+    print("\n---original df----")
+    print(df.dtypes)
+
+    print("\n--- Conversion Report ---")
+    print(conversion_report)
+
+    print("\n--- Cleaned DataFrame ---")
+    print(cleaned_df.dtypes)
+    print(cleaned_df.head())
+
+if __name__ == "__main__":
+    main()

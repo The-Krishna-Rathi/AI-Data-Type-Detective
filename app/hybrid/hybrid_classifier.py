@@ -22,9 +22,9 @@ class HybridClassifier:
         return {
             "column_name": column_name,
             "final_type": final_type,
-            "rule_based": rule_result,
-            "ai_inference": ai_result,
-            "profile": profile
+            #"rule_based": rule_result,
+            #"ai_inference": ai_result,
+            #"profile": profile
         }
 
     def weighted_vote(self, rule, ai):
